@@ -21,7 +21,7 @@ RUN npm ci
 #HEALTHCHECK --interval=30s \
 #  CMD node healthcheck.js
 
-# copy in our source code last, as it changes the most
+# copy in our src code last, as it changes the most
 COPY . /code
 
 # if you want to use npm start instead, then use `docker run --init in production`
