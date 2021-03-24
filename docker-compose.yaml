@@ -1,22 +1,54 @@
 version: "3.7"
 services:
   backend:
-    build:
-      args:
-        - NODE_ENV=development
-      context: backend
-    command: "${BackendNpmRun}"
+    build: ./backend
+#    depends_on:
+#      - db
+    command: "${BACKEND_CMD}"
     environment:
-      - DATABASE_DB=example
-      - DATABASE_USER=root
-      - DATABASE_PASSWORD=/run/secrets/db-password
+      - DATABASE_DB=${POSTGRES_DB}
+      - DATABASE_USER=${POSTGRES_USER}
+      - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
       - DATABASE_HOST=db
-      - NODE_ENV=development
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${BACKEND_PORT}
     ports:
-      - 80:80
+      - ${BACKEND_PORT}:${BACKEND_PORT}
       - 9229:9229
       - 9230:9230
     volumes:
-      - ./backend/src:/code/src:ro
-      - ./backend/package.json:/code/package.json
-      - ./backend/package-lock.json:/code/package-lock.json
+      - ./backend:/code
+      - /code/node_modules
+      # https://docs.docker.com/compose/compose-file/compose-file-v3/#volumes-for-services-swarms-and-stack-files
+      # In the absence of having named volumes with specified sources, Docker creates an anonymous volume for each task
+      # backing a service. Anonymous volumes do not persist after the associated containers are removed.
+      # https://docs.docker.com/storage/volumes/#populate-a-volume-using-a-container
+      # If you start a container which creates a new volume, as above, and the container has files or directories in the
+      # directory to be mounted (such as `node_modules` above), the directory’s contents are copied into the volume.
+      # The container then mounts and uses the volume, and other containers which use the volume also have access to the
+      # pre-populated content.
+  frontend:
+    build: ./frontend
+    command: "${FRONTEND_CMD}"
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${FRONTEND_PORT}
+    ports:
+      - ${FRONTEND_PORT}:${FRONTEND_PORT}
+    volumes:
+      - ./frontend:/code
+      - /code/node_modules
+
+  db:
+    image: postgres
+    restart: always
+    secrets:
+      - db-password
+      -
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=example
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+volumes:
+  db-data:

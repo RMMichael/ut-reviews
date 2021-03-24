@@ -1,10 +1,26 @@
-function component() {
-  const element = document.createElement('div');
+import React from 'react';
+import ReactDOM from 'react-dom';
+import 'bootstrap/dist/css/bootstrap-reboot.css';
+import styles from './index.css';
 
-  // Lodash, currently included via a script, is required for this line to work
-  element.innerHTML = _.join(['Hello', 'webpack'], ' ');
-
-  return element;
+function Body() {
+  return <>
+    <Header />
+    <Main />
+  </>
 }
 
-document.body.appendChild(component());
+function Header() {
+  return <div>HEADER</div>
+}
+
+function Main() {
+  return <main className={styles.foo}>
+    <h1>Hello, world!</h1>
+  </main>
+}
+
+ReactDOM.render(
+    <Body />,
+    document.querySelector('body')
+);
