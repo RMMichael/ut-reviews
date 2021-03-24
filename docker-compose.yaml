@@ -2,16 +2,17 @@ version: "3.7"
 services:
   backend:
     build: ./backend
-#    depends_on:
-#      - db
+    depends_on:
+      - db
     command: "${BACKEND_CMD}"
     environment:
-      - DATABASE_DB=${POSTGRES_DB}
-      - DATABASE_USER=${POSTGRES_USER}
-      - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
-      - DATABASE_HOST=db
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
       - NODE_ENV=${NODE_ENV}
-      - PORT=${BACKEND_PORT}
+      - BACKEND_PORT=${BACKEND_PORT}
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}
       - 9229:9229
@@ -32,7 +33,7 @@ services:
     command: "${FRONTEND_CMD}"
     environment:
       - NODE_ENV=${NODE_ENV}
-      - PORT=${FRONTEND_PORT}
+      - FRONTEND_PORT=${FRONTEND_PORT}
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}
     volumes:
@@ -40,15 +41,12 @@ services:
       - /code/node_modules
 
   db:
-    image: postgres
-    restart: always
-    secrets:
-      - db-password
-      -
+    image: postgres:13
     volumes:
-      - db-data:/var/lib/postgresql/data
+#      - ./db/data:/var/lib/postgresql/data
+      # https://github.com/docker-library/docs/blob/master/postgres/README.md#initialization-scripts
+      - ./db/initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
     environment:
-      - POSTGRES_DB=example
-      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
-volumes:
-  db-data:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - 5432:5432

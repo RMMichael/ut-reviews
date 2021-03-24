@@ -79,6 +79,7 @@ module.exports = {
   mode: process.env.NODE_ENV === 'development' ? 'development' : 'production',
   devtool: 'inline-source-map',
   devServer: {
+    port: process.env.FRONTEND_PORT,
     contentBase: './dist',
     proxy: {
       '/api': `http://127.0.0.1:${process.env.BACKEND_PORT}`
