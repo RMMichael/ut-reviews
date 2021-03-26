@@ -80,7 +80,7 @@ module.exports = {
   devtool: 'inline-source-map',
   devServer: {
     port: process.env.FRONTEND_PORT,
-    contentBase: './dist',
+    // contentBase: './dist', // everything generated is served in-memory
     proxy: {
       '/api': `http://127.0.0.1:${process.env.BACKEND_PORT}`
     },
@@ -88,6 +88,7 @@ module.exports = {
       disableDotRule: true,
       index: '/index.html',
     },
+    writeToDisk: true
   },
   // cache: true,
 };
