@@ -2,9 +2,9 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node src/app.js",
     "start-watch": "nodemon src/app.js --inspect=0.0.0.0:9229",
     "start-wait-debuger": "nodemon src/index.js --inspect-brk=0.0.0.0:9229",
     "test": "cross-env NODE_ENV=test PORT=8081 mocha --timeout 10000 --exit --inspect=0.0.0.0:9230",

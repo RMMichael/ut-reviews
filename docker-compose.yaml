@@ -1,41 +1,37 @@
-version: "3.7"
+# env variables
+#   required: NODE_ENV=development|production, POSTGRES_PASSWORD
+#   optional (for dev host port conflicts): FRONTEND_PORT, BACKEND_PORT, DB_PORT, NGINX_PORT
+
+version: "3"
 services:
   backend:
     build: ./backend
     depends_on:
       - db
-    command: "${BACKEND_CMD}"
+    command: if [ "$NODE_ENV" = "development" ] ; then npm run start-watch ; else npm run start ; fi
     environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_NAME=postgres
-      - DB_USER=postgres
-      - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - NODE_ENV=${NODE_ENV}
-      - BACKEND_PORT=${BACKEND_PORT}
+      - DB_URL="postgresql://postgres:${POSTGRES_PASSWORD:?required}@db:5432/postgres?sslmode=disable"
+      - NODE_ENV=${NODE_ENV:-production}
+      - BACKEND_PORT=3000
     ports:
-      - ${BACKEND_PORT}:${BACKEND_PORT}
+      - ${BACKEND_PORT:-3000}:3000
       - 9229:9229
       - 9230:9230
     volumes:
       - ./backend:/code
       - /code/node_modules
+      # keep node_modules within container
       # https://docs.docker.com/compose/compose-file/compose-file-v3/#volumes-for-services-swarms-and-stack-files
-      # In the absence of having named volumes with specified sources, Docker creates an anonymous volume for each task
-      # backing a service. Anonymous volumes do not persist after the associated containers are removed.
       # https://docs.docker.com/storage/volumes/#populate-a-volume-using-a-container
-      # If you start a container which creates a new volume, as above, and the container has files or directories in the
-      # directory to be mounted (such as `node_modules` above), the directory’s contents are copied into the volume.
-      # The container then mounts and uses the volume, and other containers which use the volume also have access to the
-      # pre-populated content.
   frontend:
     build: ./frontend
-    command: "${FRONTEND_CMD}"
+    command: if [ "$NODE_ENV" = "development" ] ; then npm run dev ; else npm run build ; fi
     environment:
-      - NODE_ENV=${NODE_ENV}
-      - FRONTEND_PORT=${FRONTEND_PORT}
+      - NODE_ENV=${NODE_ENV:-production}
+      - FRONTEND_PORT=8080
+      - BACKEND_PORT=3000
     ports:
-      - ${FRONTEND_PORT}:${FRONTEND_PORT}
+      - ${FRONTEND_PORT:-8080}:8080
     volumes:
       - ./frontend:/code
       - /code/node_modules
@@ -47,18 +43,26 @@ services:
       # https://github.com/docker-library/docs/blob/master/postgres/README.md#initialization-scripts
       - ./db/initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
     environment:
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?required}
     ports:
-      - 5432:5432
+      - ${DB_PORT:-5432}:5432
 
   nginx:
-    build: nginx
+    build: ./nginx
     depends_on:
       - backend
       - frontend
     ports:
-      - 80:80
+      - ${NGINX_HTTP_PORT:-80}:80
+      - ${NGINX_HTTPS_PORT:-443}:443
     volumes:
       - ./frontend/dist:/usr/share/nginx/html
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
 
+  # enabling https
+  # for development, https://web.dev/how-to-use-local-https/
+  # for production,
+  # certbot will be installed natively on the server with auto renew and a posthook to reload nginx
+  # docker-compose exec nginx nginx -s reload
+  # https://certbot.eff.org/lets-encrypt/ubuntufocal-nginx
+  # https://certbot.eff.org/docs/using.html#renewing-certificates

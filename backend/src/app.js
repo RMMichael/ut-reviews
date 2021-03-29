@@ -1,22 +1,16 @@
 const express = require('express')
 const app = express()
 const { Pool } = require('pg');
-const port = process.env.BACKEND_PORT
 const {
-  DB_HOST,
-  DB_PORT,
-  DB_NAME,
-  DB_USER,
-  DB_PASSWORD
+  DB_URL,
+  NODE_ENV,
+  BACKEND_PORT
 } = process.env;
 
-// DATABASE_URL=postgres://localhost:5432/rick?sslmode=disable
-const db_url = `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable`;
-
-console.log(db_url);
+console.log(DB_URL);
 
 const pool = new Pool({
-  connectionString: db_url,
+  connectionString: DB_URL,
   ssl: {
     rejectUnauthorized: false
   }
@@ -50,11 +44,11 @@ app.get('/api/db', async (req, res) => {
 //   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 // });
 
-console.log("port == " + port)
+console.log("port == " + BACKEND_PORT)
 app.get('/', (req, res) => {
-  res.send(process.env.NODE_ENV)
+  res.send(NODE_ENV)
 })
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+app.listen(BACKEND_PORT, () => {
+  console.log(`Example app listening at http://localhost:${BACKEND_PORT}`)
 })

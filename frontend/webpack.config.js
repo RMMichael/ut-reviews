@@ -82,7 +82,7 @@ module.exports = {
     port: process.env.FRONTEND_PORT,
     // contentBase: './dist', // everything generated is served in-memory
     proxy: {
-      '/api': `http://127.0.0.1:${process.env.BACKEND_PORT}`
+      '/api': `http://backend:${process.env.BACKEND_PORT}`
     },
     historyApiFallback: {
       disableDotRule: true,
