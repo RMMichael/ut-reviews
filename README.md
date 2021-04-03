@@ -1,7 +1,7 @@
 # ut-reviews
 ## TODO
 - [x] nginx works locally
-- [ ] nginx works on aws
+- [x] nginx works on aws
 - [ ] https set up
 - [ ] integrate google account sign in, express sessions, users table in db
 - [ ] express api https://github.com/cdimascio/express-openapi-validator
@@ -25,4 +25,5 @@
 - `docker-compose exec SERVICE /bin/bash` - connect to backend/frontend/... container
   labeled by `service` in docker-compose.yaml
 - `docker-compose logs --help` - view logs from containers
+
 
