@@ -6,7 +6,7 @@
 #   optional: (for dev host port conflicts) FRONTEND_PORT, BACKEND_PORT, DB_PORT, NGINX_PORT
 
 # TODO maybe [ "bash", "-c", "if [ "$NODE_ENV" = "development" ]; then ; else ; fi" ]
-version: "3"
+version: "3.8"
 services:
   backend:
     build: ./backend
@@ -45,7 +45,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?required}
 
   nginx:
-    image: nginx:1.19
+    build: ./nginx
     depends_on:
       - backend
       - frontend
@@ -56,7 +56,13 @@ services:
       - ./frontend/dist:/usr/share/nginx/html
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       # managed by Certbot
-      - /etc/letsencrypt:/etc/letsencrypt
+      # user must supply generated key and cert path in .env to use in productuon
+      # or copy with default to the path specified on the right of : - supply self generated key in the location below
+      - ${KEY_FOLDER:-tlskey}:/etc/ssl/private
+      - ${CERT_FOLDER:-tlscert}:/etc/ssl/certs
+volumes:
+  tlskey:
+  tlscert:
 
   # TODO nginx environment variables ?
   # https://github.com/docker-library/docs/tree/master/nginx#using-environment-variables-in-nginx-configuration-new-in-119

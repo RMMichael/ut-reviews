@@ -26,4 +26,19 @@
   labeled by `service` in docker-compose.yaml
 - `docker-compose logs --help` - view logs from containers
 
+## Setting up https
+- certbot [quickstart](https://certbot.eff.org/lets-encrypt/ubuntufocal-nginx)
+- certbot [docs](https://certbot.eff.org/docs/using.html)
+- nginx serves static files from `./frontend/dist` and we configure it to serve
+  `/.well-known/acme-challenge/` over http port 80 to validate the server (see also `nginx.conf`)
+- `sudo cerbot certonly --webroot -w ./frontend/dist -d ut-reviews.com -d www.ut-reviews.com`
 
+## Setting up https in development (optional)
+- for development, typically test using frontend webpack dev server on `localhost:8080`
+- this is for testing nginx using `localhost:80` and `localhost:443` without https warnings
+- https://web.dev/how-to-use-local-https/
+  - `mkcert -key-file privkey.pem -cert-file fullchain.pem localhost`
+  - set the directories in `.env` (/path/to/containing/folder)
+    - `KEY_FOLDER=./`
+    - `CERT_FOLDER=./`
+  - `mkcert -uninstall` will remove the installed CA from your browser and system

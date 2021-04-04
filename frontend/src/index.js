@@ -11,7 +11,7 @@ function Body() {
 }
 
 function Header() {
-  // return <div>HEADER</div>
+  return <div>HEADER</div>
 }
 
 function Main() {
