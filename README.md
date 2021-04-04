@@ -19,6 +19,8 @@
   - docker
   - aws ec2
   - nginx
+
+# Development
 ## Useful Commands
 - `docker-compose up --build [-d]` - build images and run containers \[in background\]
 - `docker-compose down` - stops and removes containers and networks from `docker-compose up`
@@ -31,7 +33,11 @@
 - certbot [docs](https://certbot.eff.org/docs/using.html)
 - nginx serves static files from `./frontend/dist` and we configure it to serve
   `/.well-known/acme-challenge/` over http port 80 to validate the server (see also `nginx.conf`)
-- `sudo cerbot certonly --webroot -w ./frontend/dist -d ut-reviews.com -d www.ut-reviews.com`
+- assuming project is in `~/ut-reviews` and config file is in `~/letsencrypt/cli.ini`
+- `sudo cerbot certonly --dry-run --config-dir ~/letsencrypt --webroot -w ~/ut-reviews/frontend/dist -d ut-reviews.com -d www.ut-reviews.com`
+- remove `--dry-run` when it works
+- `sudo certbot renew --dry-run --config-dir ~/letsencrypt` test automatic renew
+- add to `.env`: `KEY_FILE=/path/to/privkey.pem` and `CERT_FILE=/path/to/fullchain.pem` 
 
 ## Setting up https in development (optional)
 - for development, typically test using frontend webpack dev server on `localhost:8080`

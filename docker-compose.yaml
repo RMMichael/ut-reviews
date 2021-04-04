@@ -58,11 +58,8 @@ services:
       # managed by Certbot
       # user must supply generated key and cert path in .env to use in productuon
       # or copy with default to the path specified on the right of : - supply self generated key in the location below
-      - ${KEY_FOLDER:-tlskey}:/etc/ssl/private
-      - ${CERT_FOLDER:-tlscert}:/etc/ssl/certs
-volumes:
-  tlskey:
-  tlscert:
+      - ${KEY_FILE}:/etc/ssl/private/privkey.pem
+      - ${CERT_FILE}:/etc/ssl/certs/fullchain.pem
 
   # TODO nginx environment variables ?
   # https://github.com/docker-library/docs/tree/master/nginx#using-environment-variables-in-nginx-configuration-new-in-119
